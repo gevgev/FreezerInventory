@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 class FilterViewModel: ObservableObject {
     @Published var categories: [Category] = []
     @Published var tags: [Tag] = []
@@ -30,23 +31,28 @@ class FilterViewModel: ObservableObject {
         errorMessage = nil
         
         do {
-            async let categoriesResponse: [Category] = APIClient.shared.request(endpoint: "/categories")
-            async let tagsResponse: [Tag] = APIClient.shared.request(endpoint: "/tags")
+            async let categoriesResponse: [Category] = APIClient.shared.request(endpoint: "/api/categories")
+            async let tagsResponse: [Tag] = APIClient.shared.request(endpoint: "/api/tags")
             
             let (fetchedCategories, fetchedTags) = try await (categoriesResponse, tagsResponse)
             
-            DispatchQueue.main.async {
-                self.allCategories = fetchedCategories
-                self.allTags = fetchedTags
-                self.categories = fetchedCategories
-                self.tags = fetchedTags
-                self.isLoading = false
+            self.categories = fetchedCategories
+            self.tags = fetchedTags
+            self.isLoading = false
+            
+        } catch let error as APIError {
+            switch error {
+            case .decodingError:
+                errorMessage = "Failed to load filters"
+            case .serverError(let message):
+                errorMessage = message
+            default:
+                errorMessage = error.localizedDescription
             }
+            self.isLoading = false
         } catch {
-            DispatchQueue.main.async {
-                self.errorMessage = error.localizedDescription
-                self.isLoading = false
-            }
+            errorMessage = error.localizedDescription
+            self.isLoading = false
         }
     }
 } 
