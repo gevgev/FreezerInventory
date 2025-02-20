@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 class LoginViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
@@ -31,44 +32,43 @@ class LoginViewModel: ObservableObject {
     }
     
     func login() async {
+        print("Starting login process...")
         isLoading = true
         errorMessage = nil
         
         do {
-            let loginData = try JSONEncoder().encode([
-                "email": email,
-                "password": password
-            ])
+            let loginRequest = LoginRequest(email: email, password: password)
+            let loginData = try JSONEncoder().encode(loginRequest)
             
+            print("Sending login request...")
             let response: AuthResponse = try await APIClient.shared.request(
                 endpoint: "/auth/login",
                 method: "POST",
                 body: loginData
             )
             
-            DispatchQueue.main.async {
-                AuthenticationManager.shared.saveUserSession(token: response.token, user: response.user)
-                self.isLoggedIn = true
-                self.isLoading = false
-            }
+            print("Login successful, saving session...")
+            AuthenticationManager.shared.saveUserSession(token: response.token, user: response.user)
+            print("Session saved, setting isLoggedIn to true")
+            self.isLoggedIn = true
+            self.isLoading = false
             
         } catch let error as APIError {
-            DispatchQueue.main.async {
-                switch error {
-                case .unauthorized:
-                    self.errorMessage = "Invalid email or password"
-                case .serverError(let message):
-                    self.errorMessage = "Server error: \(message)"
-                default:
-                    self.errorMessage = "An error occurred. Please try again."
-                }
-                self.isLoading = false
+            print("API Error: \(error)")
+            switch error {
+            case .unauthorized:
+                self.errorMessage = "Invalid email or password"
+            case .serverError(let message):
+                self.errorMessage = "Server error: \(message)"
+            case .decodingError:
+                self.errorMessage = "Failed to process server response"
+            default:
+                self.errorMessage = "An error occurred. Please try again."
             }
+            self.isLoading = false
         } catch {
-            DispatchQueue.main.async {
-                self.errorMessage = error.localizedDescription
-                self.isLoading = false
-            }
+            self.errorMessage = error.localizedDescription
+            self.isLoading = false
         }
     }
 }
@@ -86,9 +86,4 @@ extension String {
         let passwordPredicate = NSPredicate(format:"SELF MATCHES %@", passwordRegex)
         return passwordPredicate.evaluate(with: self)
     }
-}
-
-struct AuthResponse: Codable {
-    let token: String
-    let user: User
 } 

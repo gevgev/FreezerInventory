@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 class InventoryListViewModel: ObservableObject {
     @Published var items: [Item] = []
     @Published var isLoading = false
@@ -13,19 +14,26 @@ class InventoryListViewModel: ObservableObject {
         errorMessage = nil
         
         do {
-            let response: [Item] = try await APIClient.shared.request(
-                endpoint: "/inventory"
+            let items: [Item] = try await APIClient.shared.request(
+                endpoint: "/api/items"
             )
             
-            DispatchQueue.main.async {
-                self.items = response
-                self.isLoading = false
+            self.items = items
+            self.isLoading = false
+            
+        } catch let error as APIError {
+            switch error {
+            case .decodingError:
+                errorMessage = "Failed to load inventory data"
+            case .serverError(let message):
+                errorMessage = message
+            default:
+                errorMessage = error.localizedDescription
             }
+            self.isLoading = false
         } catch {
-            DispatchQueue.main.async {
-                self.errorMessage = error.localizedDescription
-                self.isLoading = false
-            }
+            errorMessage = error.localizedDescription
+            self.isLoading = false
         }
     }
     
@@ -33,12 +41,16 @@ class InventoryListViewModel: ObservableObject {
         var filtered = items
         
         if let category = selectedCategory {
-            filtered = filtered.filter { $0.categories.contains(category) }
+            filtered = filtered.filter { item in
+                guard let categories = item.categories else { return false }
+                return categories.contains(category)
+            }
         }
         
         if !selectedTags.isEmpty {
             filtered = filtered.filter { item in
-                !Set(item.tags).isDisjoint(with: selectedTags)
+                guard let tags = item.tags else { return false }
+                return !Set(tags).isDisjoint(with: selectedTags)
             }
         }
         

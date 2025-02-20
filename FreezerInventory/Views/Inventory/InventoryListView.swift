@@ -76,16 +76,30 @@ struct InventoryItemRow: View {
                     .foregroundColor(.secondary)
             }
             
-            HStack {
-                ForEach(item.categories) { category in
-                    Text(category.name)
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.blue.opacity(0.2))
-                        .cornerRadius(8)
+            if let categories = item.categories, !categories.isEmpty {
+                HStack {
+                    ForEach(categories) { category in
+                        Text(category.name)
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.blue.opacity(0.2))
+                            .cornerRadius(8)
+                    }
                 }
             }
+            
+            HStack {
+                if let packaging = item.packaging {
+                    Text(packaging)
+                        .font(.caption)
+                }
+                if let weightUnit = item.weightUnit {
+                    Text("(\(weightUnit))")
+                        .font(.caption)
+                }
+            }
+            .foregroundColor(.secondary)
         }
         .padding(.vertical, 8)
     }

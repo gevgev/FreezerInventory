@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 class AuthenticationManager: ObservableObject {
     static let shared = AuthenticationManager()
     
@@ -28,8 +29,8 @@ class AuthenticationManager: ObservableObject {
     }
     
     func clearSession() {
-        token = nil
-        currentUser = nil
+        self.token = nil
+        self.currentUser = nil
         UserDefaults.standard.removeObject(forKey: userKey)
         UserDefaults.standard.removeObject(forKey: tokenKey)
     }
