@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LoginView: View {
     @StateObject var viewModel: LoginViewModel
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(spacing: 20) {
@@ -14,10 +15,13 @@ struct LoginView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .textContentType(.emailAddress)
                     .autocapitalization(.none)
+                    .keyboardType(.emailAddress)
+                    .disabled(viewModel.isLoading)
                 
                 SecureField("Password", text: $viewModel.password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .textContentType(.password)
+                    .disabled(viewModel.isLoading)
             }
             .padding(.horizontal)
             
@@ -25,6 +29,8 @@ struct LoginView: View {
                 Text(error)
                     .foregroundColor(.red)
                     .font(.caption)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
             }
             
             Button(action: {
@@ -47,8 +53,14 @@ struct LoginView: View {
             .cornerRadius(10)
             .padding(.horizontal)
             .disabled(viewModel.isLoading)
+            
+            NavigationLink(destination: InventoryListView(viewModel: InventoryListViewModel()),
+                         isActive: $viewModel.isLoggedIn) {
+                EmptyView()
+            }
         }
         .padding()
+        .navigationBarHidden(true)
     }
 }
 

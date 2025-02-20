@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7EA2054D2D66BB6200B5B70A /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 7EA2054C2D66BB6200B5B70A /* KeychainAccess */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		7EA204DF2D66B3A600B5B70A /* FreezerInventory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreezerInventory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EA2054D2D66BB6200B5B70A /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = FreezerInventory;
 			packageProductDependencies = (
+				7EA2054C2D66BB6200B5B70A /* KeychainAccess */,
 			);
 			productName = FreezerInventory;
 			productReference = 7EA204DF2D66B3A600B5B70A /* FreezerInventory.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = 7EA204D62D66B3A600B5B70A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7EA2054B2D66BB6200B5B70A /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7EA204E02D66B3A600B5B70A /* Products */;
 			projectDirPath = "";
@@ -333,6 +342,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7EA2054B2D66BB6200B5B70A /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7EA2054C2D66BB6200B5B70A /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7EA2054B2D66BB6200B5B70A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7EA204D72D66B3A600B5B70A /* Project object */;
 }

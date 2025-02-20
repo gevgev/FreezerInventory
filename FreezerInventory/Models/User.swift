@@ -9,4 +9,10 @@ struct User: Codable {
         case admin
         case user
     }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case email
+        case role
+    }
 } 

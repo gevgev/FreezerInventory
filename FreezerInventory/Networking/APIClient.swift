@@ -10,12 +10,7 @@ enum APIError: Error {
 
 class APIClient {
     static let shared = APIClient()
-    private let baseURL = "YOUR_API_BASE_URL"
-    private var authToken: String?
-    
-    func setAuthToken(_ token: String) {
-        self.authToken = token
-    }
+    private let baseURL = "http://localhost:8080"  // From your API doc
     
     func request<T: Codable>(endpoint: String,
                             method: String = "GET",
@@ -28,7 +23,7 @@ class APIClient {
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        if let token = authToken {
+        if let token = AuthenticationManager.shared.token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
@@ -50,6 +45,7 @@ class APIClient {
                 throw APIError.decodingError
             }
         case 401:
+            AuthenticationManager.shared.clearSession() // Clear invalid session
             throw APIError.unauthorized
         default:
             throw APIError.serverError("Server error: \(httpResponse.statusCode)")
