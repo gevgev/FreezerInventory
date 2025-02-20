@@ -2,6 +2,7 @@ import SwiftUI
 
 struct InventoryListView: View {
     @StateObject var viewModel: InventoryListViewModel
+    @State private var showingFilters = false
     
     var body: some View {
         NavigationView {
@@ -32,11 +33,27 @@ struct InventoryListView: View {
                 
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        // Show filters
+                        showingFilters = true
                     }) {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
+                        HStack {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                            if viewModel.selectedCategory != nil || !viewModel.selectedTags.isEmpty {
+                                Text("\(viewModel.selectedTags.count + (viewModel.selectedCategory != nil ? 1 : 0))")
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                    .padding(6)
+                                    .background(Color.blue)
+                                    .clipShape(Circle())
+                            }
+                        }
                     }
                 }
+            }
+            .sheet(isPresented: $showingFilters) {
+                FilterView(
+                    filterViewModel: FilterViewModel(),
+                    inventoryViewModel: viewModel
+                )
             }
         }
         .task {
