@@ -5,6 +5,12 @@ struct Category: Codable, Identifiable, Hashable {
     var name: String
     var description: String?
     
+    enum CodingKeys: String, CodingKey {
+        case id = "ID"
+        case name = "Name"
+        case description = "Description"
+    }
+    
     // Implement Hashable conformance
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

@@ -1,0 +1,177 @@
+Frontend PRD – Freezer Inventory Management Mobile App
+
+Project Name: Freezer Inventory Management App
+Date: February 13, 2025
+Version: 1.9
+
+1. Overview
+
+The Freezer Inventory Management App is a native iPhone application designed to help users track, manage, and optimize their freezer inventory. Users can add, remove, and monitor food items manually or via AI-powered barcode scanning and image recognition. The app integrates with the Golang backend via RESTful APIs for authentication, inventory tracking, category/tag management, and reporting.
+
+2. Functional Requirements
+
+2.1 Two-Level Menu Structure
+
+Main Sections:
+	1.	Account Settings & Login
+	•	User Authentication – Login with email and password.
+	•	Role-based Access – Admin vs. User.
+	2.	Item Management
+	•	Add Items – Manually, via barcode scanning, or image recognition.
+	•	Edit Item Details – Name, description, barcode, image, packaging.
+	•	Mark Items as Discontinued – Remove from active inventory.
+	•	View Items by Categories & Tags – Organized food tracking.
+	3.	Inventory Operations
+	•	Add Inventory – Select item, specify quantity and weight.
+	•	Remove Inventory – Select item, specify quantity and weight.
+	•	View Inventory Logs – Track historical changes.
+	4.	Inventory Reporting
+	•	View Current Inventory – Filter by categories and tags.
+	•	Track Inventory Changes – Logs for stock movement.
+	•	Monitor Stock Levels – Aggregated totals for all items.
+
+3. AI-Powered Features (Cursor AI Integration)
+	•	Barcode Scanning – AI-enhanced barcode lookup for auto-recognition.
+	•	Image-Based Item Identification – AI suggests food items from uploaded images.
+	•	Smart Inventory Insights – Expiration tracking and stock usage recommendations.
+
+4. Data Handling & Syncing
+	•	Offline Mode – Local item entry syncs with backend when online.
+	•	Real-time Updates – Fetches inventory data on demand.
+	•	Local Storage – Temporary data storage before backend sync.
+
+5. Category & Tag Management
+	•	Group Items by Categories (e.g., meats, vegetables, dairy).
+	•	Filter Items by Tags (e.g., organic, frozen meals).
+	•	Fetch & Assign Categories & Tags via API.
+
+6. Security & Authentication
+	•	JWT-Based Authentication – Managed by backend.
+	•	Role-Based Access:
+	•	Admin: Manage categories and tags.
+	•	User: Manage inventory but cannot edit categories/tags.
+
+7. API Integration with Backend
+
+The app communicates with the Golang backend API via RESTful APIs for:
+
+✅ Item Management – CRUD operations for food items.
+✅ Inventory Operations – Add/remove inventory, view logs.
+✅ Category & Tag Assignments – Organize food by category and tags.
+✅ Inventory Reporting – Fetch aggregated stock levels.
+✅ AI-Enhanced Product Recognition – Barcode lookup & image recognition.
+
+8. API Request & Response Examples
+
+8.1 Fetch Inventory Report
+
+Request:
+
+GET /inventory/report
+Authorization: Bearer {token}
+
+Response:
+
+[
+  {
+    "item_id": "123e4567-e89b-12d3-a456-426614174000",
+    "item_name": "Chicken Breast",
+    "total_quantity": 5,
+    "total_weight": 10.5
+  },
+  {
+    "item_id": "987e6543-e89b-12d3-a456-426614174999",
+    "item_name": "Frozen Vegetables",
+    "total_quantity": 2,
+    "total_weight": 3.0
+  }
+]
+
+8.2 Add Inventory
+
+Request:
+
+POST /inventory
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "item_id": "123e4567-e89b-12d3-a456-426614174000",
+  "change": 2,
+  "quantity": 2,
+  "weight": 1.5
+}
+
+Response:
+
+{
+  "message": "Inventory updated successfully",
+  "item_id": "123e4567-e89b-12d3-a456-426614174000",
+  "new_total": 7
+}
+
+8.3 Barcode Lookup
+
+Request:
+
+GET /barcode/{barcode_number}
+Authorization: Bearer {token}
+
+Response:
+
+{
+  "barcode": "012345678912",
+  "item_name": "Frozen Pizza",
+  "brand": "BrandX",
+  "packaging": "Box",
+  "image_url": "https://example.com/item_image.jpg"
+}
+
+8.4 Image Recognition for Item Identification
+
+Request:
+
+POST /image/recognize
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+
+Form Data:
+
+image: (uploaded image file)
+
+Response:
+
+{
+  "suggested_items": [
+    {
+      "item_name": "Frozen Blueberries",
+      "confidence": 98
+    },
+    {
+      "item_name": "Blackberries",
+      "confidence": 85
+    }
+  ]
+}
+
+9. User Experience & UI Design
+	•	Simple & Intuitive UI
+	•	Dark Mode Support
+	•	Swipe Actions for Quick Inventory Changes
+	•	Search & Filtering Options
+
+10. Future Enhancements
+	•	Push Notifications for low stock or expired items.
+	•	Multi-User Household Support – Shared family inventory.
+	•	Smart Home Integration – Alexa & Google Assistant compatibility.
+
+11. Summary
+
+The Freezer Inventory Management App is a native iPhone app that simplifies food tracking and organization. With AI-powered barcode recognition, image identification, real-time tracking, and backend integration, it provides an efficient and automated approach to freezer inventory management.
+
+✅ Features Summary:
+	•	Two-Level Menu Navigation for easy access.
+	•	AI-Powered Barcode & Image-Based Item Identification.
+	•	Real-Time Inventory Tracking & Reporting.
+	•	Category & Tag Filtering.
+	•	Seamless Backend Integration.

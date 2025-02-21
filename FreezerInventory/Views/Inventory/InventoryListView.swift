@@ -3,6 +3,7 @@ import SwiftUI
 struct InventoryListView: View {
     @StateObject var viewModel: InventoryListViewModel
     @State private var showingFilters = false
+    @State private var showingAddItem = false
     
     var body: some View {
         NavigationView {
@@ -18,6 +19,15 @@ struct InventoryListView: View {
                 } else {
                     List(viewModel.filteredItems()) { item in
                         InventoryItemRow(item: item)
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    Task {
+                                        await viewModel.deleteItem(item)
+                                    }
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
                     }
                 }
             }
@@ -25,7 +35,7 @@ struct InventoryListView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        // Add new item action
+                        showingAddItem = true
                     }) {
                         Image(systemName: "plus")
                     }
@@ -55,6 +65,9 @@ struct InventoryListView: View {
                     inventoryViewModel: viewModel
                 )
             }
+            .sheet(isPresented: $showingAddItem) {
+                AddItemView()
+            }
         }
         .task {
             await viewModel.fetchInventory()
@@ -64,44 +77,52 @@ struct InventoryListView: View {
 
 struct InventoryItemRow: View {
     let item: Item
+    @State private var showingInventoryEntry = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(item.name)
-                .font(.headline)
-            
-            if let description = item.description {
-                Text(description)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
-            if let categories = item.categories, !categories.isEmpty {
-                HStack {
-                    ForEach(categories) { category in
-                        Text(category.name)
-                            .font(.caption)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.blue.opacity(0.2))
-                            .cornerRadius(8)
+        Button(action: {
+            showingInventoryEntry = true
+        }) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(item.name)
+                    .font(.headline)
+                
+                if let description = item.description {
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                if let categories = item.categories, !categories.isEmpty {
+                    HStack {
+                        ForEach(categories) { category in
+                            Text(category.name)
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.blue.opacity(0.2))
+                                .cornerRadius(8)
+                        }
                     }
                 }
-            }
-            
-            HStack {
-                if let packaging = item.packaging {
-                    Text(packaging)
-                        .font(.caption)
+                
+                HStack {
+                    if let packaging = item.packaging {
+                        Text(packaging)
+                            .font(.caption)
+                    }
+                    if let weightUnit = item.weightUnit {
+                        Text("(\(weightUnit))")
+                            .font(.caption)
+                    }
                 }
-                if let weightUnit = item.weightUnit {
-                    Text("(\(weightUnit))")
-                        .font(.caption)
-                }
+                .foregroundColor(.secondary)
             }
-            .foregroundColor(.secondary)
+            .padding(.vertical, 8)
         }
-        .padding(.vertical, 8)
+        .sheet(isPresented: $showingInventoryEntry) {
+            InventoryEntryView(item: item)
+        }
     }
 }
 

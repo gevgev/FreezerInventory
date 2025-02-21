@@ -22,18 +22,29 @@ class InventoryListViewModel: ObservableObject {
             self.isLoading = false
             
         } catch let error as APIError {
-            switch error {
-            case .decodingError:
-                errorMessage = "Failed to load inventory data"
-            case .serverError(let message):
-                errorMessage = message
-            default:
-                errorMessage = error.localizedDescription
-            }
-            self.isLoading = false
+            handleError(error)
         } catch {
             errorMessage = error.localizedDescription
-            self.isLoading = false
+            isLoading = false
+        }
+    }
+    
+    func deleteItem(_ item: Item) async {
+        do {
+            let _: EmptyResponse = try await APIClient.shared.request(
+                endpoint: "/api/items/\(item.id)",
+                method: "DELETE"
+            )
+            
+            // Remove item from local array
+            if let index = items.firstIndex(where: { $0.id == item.id }) {
+                items.remove(at: index)
+            }
+            
+        } catch let error as APIError {
+            handleError(error)
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
     
@@ -56,4 +67,20 @@ class InventoryListViewModel: ObservableObject {
         
         return filtered
     }
-} 
+    
+    private func handleError(_ error: APIError) {
+        switch error {
+        case .unauthorized:
+            errorMessage = "Please log in again"
+        case .serverError(let message):
+            errorMessage = message
+        case .decodingError:
+            errorMessage = "Failed to process server response"
+        default:
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+}
+
+struct EmptyResponse: Codable {} 
