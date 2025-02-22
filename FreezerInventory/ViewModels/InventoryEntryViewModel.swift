@@ -29,11 +29,11 @@ class InventoryEntryViewModel: ObservableObject {
         
         do {
             let entry = [
-                "ItemID": item.id.uuidString,
-                "Change": quantity,
-                "Weight": weight,
-                "WeightUnit": item.weightUnit ?? "kg",
-                "Notes": notes
+                "item_id": item.id.uuidString,
+                "change": quantity,
+                "weight": weight,
+                "weight_unit": item.weightUnit?.lowercased() ?? "kg",
+                "notes": notes
             ] as [String: Any]
             
             let entryData = try JSONSerialization.data(withJSONObject: entry)
