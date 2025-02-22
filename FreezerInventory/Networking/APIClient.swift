@@ -77,9 +77,7 @@ class APIClient {
                 throw APIError.decodingError
             }
         case 401:
-            await MainActor.run {
-                AuthenticationManager.shared.clearSession()
-            }
+            await AuthenticationManager.shared.handleUnauthorized()
             throw APIError.unauthorized
         case 404:
             throw APIError.serverError("Resource not found")
