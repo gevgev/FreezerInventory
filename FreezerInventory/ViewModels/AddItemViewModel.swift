@@ -25,13 +25,16 @@ class AddItemViewModel: ObservableObject {
         errorMessage = nil
         
         do {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            
             let item = [
-                "Name": name,
-                "Description": description,
-                "Barcode": barcode,
-                "Packaging": packaging,
-                "WeightUnit": weightUnit,
-                "ExpirationDate": ISO8601DateFormatter().string(from: expirationDate)
+                "name": name,
+                "description": description,
+                "barcode": barcode,
+                "packaging": packaging,
+                "weight_unit": weightUnit,
+                "expiration_date": dateFormatter.string(from: expirationDate)
             ]
             
             let itemData = try JSONSerialization.data(withJSONObject: item)
