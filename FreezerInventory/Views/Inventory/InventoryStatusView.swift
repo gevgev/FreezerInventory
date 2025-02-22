@@ -4,7 +4,7 @@ struct InventoryStatusView: View {
     @StateObject private var viewModel = InventoryStatusViewModel()
     
     var body: some View {
-        Group {
+        List {
             if viewModel.isLoading {
                 ProgressView()
             } else if let error = viewModel.errorMessage {
@@ -14,30 +14,29 @@ struct InventoryStatusView: View {
                     }
                 })
             } else {
-                List {
-                    ForEach(viewModel.inventory) { item in
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(item.itemName)
-                                .font(.headline)
-                            
-                            HStack {
-                                Label("\(item.quantity)", systemImage: "number")
-                                Spacer()
-                                Label("\(String(format: "%.1f", item.weight)) \(item.weightUnit)", systemImage: "scalemass")
-                            }
-                            .foregroundColor(.secondary)
-                            
-                            Text("Last updated: \(formatDate(item.lastUpdated))")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                ForEach(viewModel.inventory) { item in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(item.itemName)
+                            .font(.headline)
+                        
+                        HStack {
+                            Label("\(item.quantity)", systemImage: "number")
+                            Spacer()
+                            Label("\(String(format: "%.1f", item.weight)) \(item.weightUnit)", systemImage: "scalemass")
                         }
-                        .padding(.vertical, 4)
+                        .foregroundColor(.secondary)
+                        
+                        Text("Last updated: \(formatDate(item.lastUpdated))")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                }
-                .refreshable {
-                    await viewModel.fetchInventoryStatus()
+                    .padding(.vertical, 4)
                 }
             }
+        }
+        .listStyle(.insetGrouped)
+        .refreshable {
+            await viewModel.fetchInventoryStatus()
         }
         .navigationTitle("Current Inventory")
         .task {

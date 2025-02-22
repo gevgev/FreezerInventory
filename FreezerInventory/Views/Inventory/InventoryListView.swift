@@ -6,68 +6,70 @@ struct InventoryListView: View {
     @State private var showingAddItem = false
     
     var body: some View {
-        NavigationView {
-            Group {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else if let error = viewModel.errorMessage {
-                    ErrorView(message: error, retryAction: {
-                        Task {
-                            await viewModel.fetchInventory()
-                        }
-                    })
-                } else {
-                    List(viewModel.filteredItems()) { item in
-                        InventoryItemRow(item: item)
-                            .swipeActions(edge: .trailing) {
-                                Button(role: .destructive) {
-                                    Task {
-                                        await viewModel.deleteItem(item)
-                                    }
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
+        List {
+            if viewModel.isLoading {
+                ProgressView()
+            } else if let error = viewModel.errorMessage {
+                ErrorView(message: error, retryAction: {
+                    Task {
+                        await viewModel.fetchInventory()
+                    }
+                })
+            } else {
+                ForEach(viewModel.filteredItems()) { item in
+                    InventoryItemRow(item: item)
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                Task {
+                                    await viewModel.deleteItem(item)
                                 }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
                             }
-                    }
+                        }
                 }
             }
-            .navigationTitle("Inventory")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingAddItem = true
-                    }) {
-                        Image(systemName: "plus")
-                    }
+        }
+        .listStyle(.insetGrouped)
+        .refreshable {
+            await viewModel.fetchInventory()
+        }
+        .navigationTitle("Inventory")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showingAddItem = true
+                }) {
+                    Image(systemName: "plus")
                 }
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        showingFilters = true
-                    }) {
-                        HStack {
-                            Image(systemName: "line.3.horizontal.decrease.circle")
-                            if viewModel.selectedCategory != nil || !viewModel.selectedTags.isEmpty {
-                                Text("\(viewModel.selectedTags.count + (viewModel.selectedCategory != nil ? 1 : 0))")
-                                    .font(.caption)
-                                    .foregroundColor(.white)
-                                    .padding(6)
-                                    .background(Color.blue)
-                                    .clipShape(Circle())
-                            }
+            }
+            
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    showingFilters = true
+                }) {
+                    HStack {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                        if viewModel.selectedCategory != nil || !viewModel.selectedTags.isEmpty {
+                            Text("\(viewModel.selectedTags.count + (viewModel.selectedCategory != nil ? 1 : 0))")
+                                .font(.caption)
+                                .foregroundColor(.white)
+                                .padding(6)
+                                .background(Color.blue)
+                                .clipShape(Circle())
                         }
                     }
                 }
             }
-            .sheet(isPresented: $showingFilters) {
-                FilterView(
-                    filterViewModel: FilterViewModel(),
-                    inventoryViewModel: viewModel
-                )
-            }
-            .sheet(isPresented: $showingAddItem) {
-                AddItemView()
-            }
+        }
+        .sheet(isPresented: $showingFilters) {
+            FilterView(
+                filterViewModel: FilterViewModel(),
+                inventoryViewModel: viewModel
+            )
+        }
+        .sheet(isPresented: $showingAddItem) {
+            AddItemView()
         }
         .task {
             await viewModel.fetchInventory()
@@ -94,14 +96,16 @@ struct InventoryItemRow: View {
                 }
                 
                 if let categories = item.categories, !categories.isEmpty {
-                    HStack {
-                        ForEach(categories) { category in
-                            Text(category.name)
-                                .font(.caption)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.blue.opacity(0.2))
-                                .cornerRadius(8)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(categories) { category in
+                                Text(category.name)
+                                    .font(.caption)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.blue.opacity(0.2))
+                                    .cornerRadius(8)
+                            }
                         }
                     }
                 }
@@ -142,5 +146,7 @@ struct ErrorView: View {
 }
 
 #Preview {
-    InventoryListView(viewModel: InventoryListViewModel())
+    NavigationView {
+        InventoryListView(viewModel: InventoryListViewModel())
+    }
 } 

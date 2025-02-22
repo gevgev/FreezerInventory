@@ -11,6 +11,7 @@ struct MainTabView: View {
                     NavigationView {
                         InventoryListView(viewModel: InventoryListViewModel())
                     }
+                    .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
                         Label("Items", systemImage: "list.bullet")
                     }
@@ -18,6 +19,7 @@ struct MainTabView: View {
                     NavigationView {
                         InventoryStatusView()
                     }
+                    .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
                         Label("Current Stock", systemImage: "chart.bar.fill")
                     }
@@ -26,6 +28,7 @@ struct MainTabView: View {
                         Text("Settings")
                             .navigationTitle("Settings")
                     }
+                    .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
                         Label("Settings", systemImage: "gear")
                     }
